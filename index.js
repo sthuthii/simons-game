@@ -17,6 +17,12 @@ $(document).keydown(function(event){
     console.log(gameActive);
 });
 
+$(document).touchstart(function(event){
+    $("h1").text("YOU'RE GAME HAS BEEN STARTED:");
+    gameActive = true;
+    console.log(gameActive);
+});
+
 if(gameActive){
     generateRandomColor();
     checkPlayerSequence();
