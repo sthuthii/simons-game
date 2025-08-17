@@ -3,7 +3,7 @@ let sequence = [];
 let playerSequence = [];
 let gameActive = false;
 
-// Button references (vanilla JS)
+// Button references
 const colorButtons = {
   red: document.getElementById("red"),
   green: document.getElementById("green"),
@@ -11,8 +11,12 @@ const colorButtons = {
   yellow: document.getElementById("yellow")
 };
 
-// ✅ Start game with key or touch
-$(document).on("keydown touchstart", function () {
+// ✅ Detect event type (mobile vs desktop)
+const startEvent = ("ontouchstart" in window) ? "touchstart" : "keydown";
+const clickEvent = ("ontouchstart" in window) ? "touchstart" : "click";
+
+// ✅ Start game with key/tap
+$(document).on(startEvent, function () {
   if (!gameActive) {
     $("h1").text("YOUR GAME HAS BEEN STARTED");
     gameActive = true;
@@ -36,8 +40,10 @@ function generateRandomColor() {
   console.log("Sequence:", sequence);
 }
 
-// ✅ Player clicks/taps a color
-$(".btn").on("click touchstart", function () {
+// ✅ Player taps/clicks a color
+$(".btn").on(clickEvent, function (e) {
+  e.preventDefault(); // prevent double-firing on some mobiles
+
   if (!gameActive) return;
 
   const chosenColor = $(this).attr("id");

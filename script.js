@@ -1,82 +1,62 @@
-var buttonColours = ["red", "blue", "green", "yellow"];
+const colors = ["green", "red", "yellow", "blue"];
+let gamePattern = []; // Stores the sequence the game generates
+let userClickedPattern = []; // Stores the sequence the player clicks
 
-var gamePattern = []; // created sequence
-var userClickedPattern = []; // user created sequence
+let gameActive = false; // Controls if the game is currently running
+let level = 0; // Tracks the current level of the game
 
-var started = false; // start of the game
-var level = 0; // keeping track of levels
+// Button references (though jQuery handles most interactions, these are good for initial understanding)
+const colorButtons = {
+  red: document.getElementById("red"),
+  green: document.getElementById("green"),
+  blue: document.getElementById("blue"),
+  yellow: document.getElementById("yellow")
+};
 
-// ✅ Start game with either keypress (desktop) or touch (mobile)
-$(document).on("keydown touchstart", function () {
-  if (!started) {
-    $("#level-title").text("Level " + level);
-    nextSequence();
-    started = true;
+// ✅ Detect event type (mobile vs desktop)
+const startEvent = ("ontouchstart" in window) ? "touchstart" : "keydown";
+const clickEvent = ("ontouchstart" in window) ? "touchstart" : "click";
+
+// --- Start Game ---
+$(document).on(startEvent, function () {
+  if (!gameActive) {
+    $("#level-title").text("Level " + level); // Update the level display on screen
+    gameActive = true; // Set game to active
+    nextSequence(); // Start the first sequence of the game
   }
 });
 
-// ✅ Button clicks/taps (works for both desktop + mobile)
-$(".btn").on("click touchstart", function () {
-  var userChosenColour = $(this).attr("id"); // extracts the id of the button clicked
-  userClickedPattern.push(userChosenColour); // saves the click/tap
+// --- Player Click/Tap ---
+$(".btn").on(clickEvent, function (e) {
+  e.preventDefault(); // Prevent ghost clicks on mobile
 
-  playSound(userChosenColour);
-  animatePress(userChosenColour);
+  if (!gameActive) return; // Ignore if game isn't running
 
-  checkAnswer(userClickedPattern.length - 1);
+  const userChosenColor = $(this).attr("id"); // Get button color
+  userClickedPattern.push(userChosenColor); // Add to user sequence
+
+  playSound(userChosenColor); // Play sound
+  animatePress(userChosenColor); // Animate button press
+
+  checkAnswer(userClickedPattern.length - 1); // Check answer
 });
 
-function checkAnswer(currentLevel) {
-  if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
-    if (userClickedPattern.length === gamePattern.length) {
-      setTimeout(function () {
-        nextSequence();
-      }, 1000);
-    }
-  } else {
-    playSound("wrong");
-    $("body").addClass("game-over");
-    $("#level-title").text("Game Over, Tap or Press Any Key to Restart");
-
-    setTimeout(function () {
-      $("body").removeClass("game-over");
-    }, 200);
-
-    startOver();
-  }
-}
+// --- Helper Functions ---
 
 function nextSequence() {
-  userClickedPattern = [];
-  level++;
+  userClickedPattern = []; // Reset player sequence
+  level++; // Increment level
   $("#level-title").text("Level " + level);
 
-  var randomNumber = Math.floor(Math.random() * 4);
-  var randomChosenColour = buttonColours[randomNumber];
-  gamePattern.push(randomChosenColour);
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  const randomChosenColor = colors[randomIndex];
+  gamePattern.push(randomChosenColor);
 
-  $("#" + randomChosenColour)
+  $("#" + randomChosenColor)
     .fadeIn(100)
     .fadeOut(100)
     .fadeIn(100);
 
-  playSound(randomChosenColour);
-}
-
-function animatePress(currentColor) {
-  $("#" + currentColor).addClass("pressed");
-  setTimeout(function () {
-    $("#" + currentColor).removeClass("pressed");
-  }, 100);
-}
-
-function playSound(name) {
-  var audio = new Audio("sounds/" + name + ".mp3");
-  audio.play();
-}
-
-function startOver() {
-  level = 0;
-  gamePattern = [];
-  started = false;
+  playSound(randomChosenColor);
+  console.log("Game Pattern:", gamePattern);
 }
