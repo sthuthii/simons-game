@@ -1,34 +1,66 @@
 const colors = ["green", "red", "yellow", "blue"];
 let sequence = [];
 let playerSequence = [];
-let currentStep = 0;
 let gameActive = false;
 
+// Button references (vanilla JS)
 const colorButtons = {
-    red : document.getElementById("red"),
-    green : document.getElementById("green"),
-    blue : $("blue"),
-    yellow : document.getElementById("yellow")
+  red: document.getElementById("red"),
+  green: document.getElementById("green"),
+  blue: document.getElementById("blue"),
+  yellow: document.getElementById("yellow")
 };
 
-$(document).keydown(function(event){
-    $("h1").text("YOU'RE GAME HAS BEEN STARTED");
+// ✅ Start game with key or touch
+$(document).on("keydown touchstart", function () {
+  if (!gameActive) {
+    $("h1").text("YOUR GAME HAS BEEN STARTED");
     gameActive = true;
-    console.log(gameActive);
-});
-
-$(document).touchstart(function(event){
-    $("h1").text("YOU'RE GAME HAS BEEN STARTED:");
-    gameActive = true;
-    console.log(gameActive);
-});
-
-if(gameActive){
+    sequence = [];
+    playerSequence = [];
     generateRandomColor();
-    checkPlayerSequence();
+  }
+});
+
+// ✅ Generate random color and add to sequence
+function generateRandomColor() {
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  const randomColor = colors[randomIndex];
+  sequence.push(randomColor);
+
+  // Flash the chosen button
+  $("#" + randomColor)
+    .fadeOut(100)
+    .fadeIn(100);
+
+  console.log("Sequence:", sequence);
 }
 
-function generateRandomColor(){
-    var randomColor = Math.floor(Math.random(colors)*4)+1;
-    sequence.push(randomColor);
+// ✅ Player clicks/taps a color
+$(".btn").on("click touchstart", function () {
+  if (!gameActive) return;
+
+  const chosenColor = $(this).attr("id");
+  playerSequence.push(chosenColor);
+
+  console.log("Player sequence:", playerSequence);
+
+  checkPlayerSequence();
+});
+
+// ✅ Check player's sequence
+function checkPlayerSequence() {
+  const currentStep = playerSequence.length - 1;
+
+  if (playerSequence[currentStep] !== sequence[currentStep]) {
+    $("h1").text("Game Over! Tap or Press Any Key to Restart");
+    gameActive = false;
+    return;
+  }
+
+  // If player completed the sequence correctly
+  if (playerSequence.length === sequence.length) {
+    playerSequence = [];
+    setTimeout(generateRandomColor, 1000);
+  }
 }

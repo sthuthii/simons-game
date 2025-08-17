@@ -1,62 +1,65 @@
-
 var buttonColours = ["red", "blue", "green", "yellow"];
 
-var gamePattern = []; //created sequence
+var gamePattern = []; // created sequence
 var userClickedPattern = []; // user created sequence
 
-var started = false;  //start of the game
-var level = 0; //keeping track of levels
+var started = false; // start of the game
+var level = 0; // keeping track of levels
 
-$(document).keydown(function() {
-  if (!started) { //started=false
+// ✅ Start game with either keypress (desktop) or touch (mobile)
+$(document).on("keydown touchstart", function () {
+  if (!started) {
     $("#level-title").text("Level " + level);
     nextSequence();
     started = true;
   }
 });
 
-$(".btn").click(function() {
-
-  var userChosenColour = $(this).attr("id");  //extracts the id of the button clicked
-  userClickedPattern.push(userChosenColour);   //saves the click that the user committed
+// ✅ Button clicks/taps (works for both desktop + mobile)
+$(".btn").on("click touchstart", function () {
+  var userChosenColour = $(this).attr("id"); // extracts the id of the button clicked
+  userClickedPattern.push(userChosenColour); // saves the click/tap
 
   playSound(userChosenColour);
   animatePress(userChosenColour);
 
-  checkAnswer(userClickedPattern.length-1);
+  checkAnswer(userClickedPattern.length - 1);
 });
 
 function checkAnswer(currentLevel) {
-
-    if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
-      if (userClickedPattern.length === gamePattern.length){
-        setTimeout(function () {
-          nextSequence();
-        }, 1000);
-      }
-    } else {
-      playSound("wrong");
-      $("body").addClass("game-over");
-      $("#level-title").text("Game Over, Press Any Key to Restart");
-
+  if (gamePattern[currentLevel] === userClickedPattern[currentLevel]) {
+    if (userClickedPattern.length === gamePattern.length) {
       setTimeout(function () {
-        $("body").removeClass("game-over");
-      }, 200);
-
-      startOver();
+        nextSequence();
+      }, 1000);
     }
-}
+  } else {
+    playSound("wrong");
+    $("body").addClass("game-over");
+    $("#level-title").text("Game Over, Tap or Press Any Key to Restart");
 
+    setTimeout(function () {
+      $("body").removeClass("game-over");
+    }, 200);
+
+    startOver();
+  }
+}
 
 function nextSequence() {
   userClickedPattern = [];
   level++;
   $("#level-title").text("Level " + level);
+
   var randomNumber = Math.floor(Math.random() * 4);
   var randomChosenColour = buttonColours[randomNumber];
   gamePattern.push(randomChosenColour);
 
-  $("#" + randomChosenColour).fadeIn(100).fadeOut(100).fadeIn(100);
+  $("#" + randomChosenColour)
+    .fadeIn(100)
+    .fadeOut(100)
+    .fadeIn(100);
+
   playSound(randomChosenColour);
 }
 
