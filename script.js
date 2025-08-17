@@ -8,8 +8,11 @@ let level = 0;
 const startEvent = ("ontouchstart" in window) ? "touchstart" : "keydown";
 const clickEvent = ("ontouchstart" in window) ? "touchstart" : "click";
 
-// --- Start Game ---
-$(document).on(startEvent, function () {
+// --- Start Game / Restart Game ---
+$(document).on(startEvent, function (e) {
+  // Ignore taps on color buttons when game is active
+  if ($(e.target).hasClass("btn") && gameActive) return;
+
   if (!gameActive) {
     level = 0;
     gamePattern = [];
@@ -50,7 +53,6 @@ function nextSequence() {
     .fadeIn(100);
 
   playSound(randomChosenColor);
-  console.log("Game Pattern:", gamePattern);
 }
 
 function checkAnswer(currentLevel) {
@@ -59,7 +61,7 @@ function checkAnswer(currentLevel) {
       setTimeout(nextSequence, 1000);
     }
   } else {
-    $("#level-title").text("Game Over! Tap/Press Any Key to Restart");
+    $("#level-title").text("Game Over! Tap Anywhere or Press Any Key to Restart");
     playSound("wrong");
 
     $("body").addClass("game-over");
