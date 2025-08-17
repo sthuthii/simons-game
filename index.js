@@ -3,14 +3,6 @@ let sequence = [];
 let playerSequence = [];
 let gameActive = false;
 
-// Button references
-const colorButtons = {
-  red: document.getElementById("red"),
-  green: document.getElementById("green"),
-  blue: document.getElementById("blue"),
-  yellow: document.getElementById("yellow")
-};
-
 // ✅ Detect event type (mobile vs desktop)
 const startEvent = ("ontouchstart" in window) ? "touchstart" : "keydown";
 const clickEvent = ("ontouchstart" in window) ? "touchstart" : "click";
@@ -42,7 +34,7 @@ function generateRandomColor() {
 
 // ✅ Player taps/clicks a color
 $(".btn").on(clickEvent, function (e) {
-  e.preventDefault(); // prevent double-firing on some mobiles
+  e.preventDefault(); // Stop ghost clicks on mobile
 
   if (!gameActive) return;
 
