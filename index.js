@@ -29,19 +29,21 @@ function generateRandomColor() {
     .fadeOut(100)
     .fadeIn(100);
 
+  playSound(randomColor);
   console.log("Sequence:", sequence);
 }
 
 // ✅ Player taps/clicks a color
 $(".btn").on(clickEvent, function (e) {
-  e.preventDefault(); // Stop ghost clicks on mobile
+  e.preventDefault();
 
   if (!gameActive) return;
 
   const chosenColor = $(this).attr("id");
   playerSequence.push(chosenColor);
 
-  console.log("Player sequence:", playerSequence);
+  playSound(chosenColor);
+  animatePress(chosenColor);
 
   checkPlayerSequence();
 });
@@ -52,13 +54,27 @@ function checkPlayerSequence() {
 
   if (playerSequence[currentStep] !== sequence[currentStep]) {
     $("h1").text("Game Over! Tap or Press Any Key to Restart");
+    playSound("wrong");
+    $("body").addClass("game-over");
+    setTimeout(() => $("body").removeClass("game-over"), 200);
     gameActive = false;
     return;
   }
 
-  // If player completed the sequence correctly
   if (playerSequence.length === sequence.length) {
     playerSequence = [];
     setTimeout(generateRandomColor, 1000);
   }
+}
+
+// ✅ Play sound
+function playSound(name) {
+  const audio = new Audio("sounds/" + name + ".mp3");
+  audio.play().catch(() => {});
+}
+
+// ✅ Animate button press
+function animatePress(color) {
+  $("#" + color).addClass("pressed");
+  setTimeout(() => $("#" + color).removeClass("pressed"), 100);
 }
